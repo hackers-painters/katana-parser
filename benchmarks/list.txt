@@ -1,8 +1,0 @@
-# The benchmark css files, you can download them manually.
-http://hackers-painters.github.io/katana-parser/benchmarks/input.css      
-http://hackers-painters.github.io/katana-parser/benchmarks/normalize.css  
-http://hackers-painters.github.io/katana-parser/benchmarks/semantic.css
-http://hackers-painters.github.io/katana-parser/benchmarks/bootstrap.css  
-http://hackers-painters.github.io/katana-parser/benchmarks/mediaquery.css 
-http://hackers-painters.github.io/katana-parser/benchmarks/selector.css   
-http://hackers-painters.github.io/katana-parser/benchmarks/topcoat.css
