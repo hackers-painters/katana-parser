@@ -14,8 +14,7 @@ Non-goals:
 
 * Mutability. Katana is intentionally designed to turn a style sheet into a parse tree, and free that parse tree all at once. It's not designed to persistently store nodes or subtrees outside of the parse tree, or to perform arbitrary style mutations within your program. If you need this functionality, we recommend translating the Katana parse tree into a mutable style representation more suited for the particular needs of your program before operating on it.
 
-Wishlist (aka "We couldn't get these into the original release, but are
-hoping to add them soon"):
+Wishlist:
 
 * Fully conformant with the [CSS-syntax][].
 * Hackable dump or print.
