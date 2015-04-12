@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Katana-parser by hackers-painters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Katana-parser</h1>
+      <h2 class="project-tagline">A CSS parsing library in pure C99</h2>
+      <a href="https://github.com/hackers-painters/katana-parser" class="btn">View on GitHub</a>
+      <a href="https://github.com/hackers-painters/katana-parser/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/hackers-painters/katana-parser/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="katana---a-pure-c-css-parser" class="anchor" href="#katana---a-pure-c-css-parser" aria-hidden="true"><span class="octicon octicon-link"></span></a>Katana - A pure-C CSS parser.</h1>
+
+<p>Katana is an implementation of the <a href="http://www.w3.org/Style/CSS/current-work">CSS</a> (Cascading Style Sheet) parsing algorithm implemented as a pure C library with no outside dependencies. It's designed to serve as a building block for other tools and libraries such as linters, validators, templating languages, and refactoring and analysis tools.</p>
+
+<p>Katana is inspired by <a href="https://github.com/google/gumbo-parser">Gumbo</a>, so it has some goals and features same as Gumbo.</p>
+
+<p>Goals &amp; features:</p>
+
+<ul>
+<li>Simple API that can be easily wrapped by other languages.</li>
+<li>Relatively lightweight, with no outside dependencies.</li>
+<li>Support for fragment parsing.</li>
+</ul>
+
+<p>Non-goals:</p>
+
+<ul>
+<li>Mutability. Katana is intentionally designed to turn a style sheet into a parse tree, and free that parse tree all at once. It's not designed to persistently store nodes or subtrees outside of the parse tree, or to perform arbitrary style mutations within your program. If you need this functionality, we recommend translating the Katana parse tree into a mutable style representation more suited for the particular needs of your program before operating on it.</li>
+</ul>
+
+<p>Wishlist:</p>
+
+<ul>
+<li>Fully conformant with the <a href="http://www.w3.org/TR/css3-syntax">CSS-syntax</a>.</li>
+<li>Hackable dump or print.</li>
+<li>Robust and resilient to bad input.</li>
+<li>Full-featured error reporting.</li>
+<li>Additional performance improvements.</li>
+<li>Tested on <a href="http://www.w3.org/Style/CSS/Test/">Official W3C Test Suites</a>.</li>
+</ul>
+
+<h1>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<p>To build and install the library, issue the standard UNIX incantation from the root of the distribution:</p>
+
+<div class="highlight highlight-bash"><pre>$ ./autogen.sh
+$ ./configure
+$ make
+$ sudo make install</pre></div>
+
+<p>Katana comes with full pkg-config support, so you can use the pkg-config to print the flags needed to link your program against it:</p>
+
+<div class="highlight highlight-bash"><pre>$ pkg-config --cflags katana         <span class="pl-c"># print compiler flags</span>
+$ pkg-config --libs katana           <span class="pl-c"># print linker flags</span>
+$ pkg-config --cflags --libs katana  <span class="pl-c"># print both</span></pre></div>
+
+<p>For example:</p>
+
+<div class="highlight highlight-bash"><pre>$ gcc examples/dump_css.c <span class="pl-s"><span class="pl-pds">`</span>pkg-config --cflags --libs katana<span class="pl-pds">`</span></span> -o dump</pre></div>
+
+<p>If package katana was <strong>not found in the pkg-config</strong> search path, perhaps you should add the directory containing <code>katana.pc</code> to the <code>PKG_CONFIG_PATH</code> environment variable as following:</p>
+
+<div class="highlight highlight-bash"><pre>$ <span class="pl-k">export</span> PKG_CONFIG_PATH=/usr/local/lib/pkgconfig</pre></div>
+
+<p>See the pkg-config man page for more info.</p>
+
+<h1>
+<a id="basic-usage" class="anchor" href="#basic-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basic Usage</h1>
+
+<p>Within your program, you need to include "katana.h" and then issue a call to <code>katana_parse</code>:</p>
+
+<div class="highlight highlight-C"><pre>#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>katana.h<span class="pl-pds">"</span></span>
+
+<span class="pl-k">int</span> <span class="pl-en">main</span>() {
+  <span class="pl-k">const</span> <span class="pl-k">char</span>* css = <span class="pl-s"><span class="pl-pds">"</span>selector { property: value }<span class="pl-pds">"</span></span>;
+  KatanaOutput* output = <span class="pl-c1">katana_parse</span>(css, <span class="pl-c1">strlen</span>(css), KatanaParserModeStylesheet);
+  <span class="pl-c">// Do stuff with output, eg. print the input style</span>
+  <span class="pl-c1">katana_dump_output</span>(output);
+  <span class="pl-c1">katana_destroy_output</span>(output);
+}</pre></div>
+
+<p>See the API documentation and sample programs for more details.</p>
+
+<h1>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h1>
+
+<p>Bug reports are very much welcome.  Please use GitHub's issue-tracking feature, as it makes it easier to keep track of bugs and makes it possible for other project watchers to view the existing issues.</p>
+
+<p>Patches and pull requests are also welcome.</p>
+
+<p>If you're unwilling to do this, it would be most helpful if you could file bug reports that include detailed prose about where in the code the error is and how to fix it, but leave out exact source code.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/hackers-painters/katana-parser">Katana-parser</a> is maintained by <a href="https://github.com/hackers-painters">hackers-painters</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
