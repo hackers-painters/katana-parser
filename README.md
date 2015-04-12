@@ -46,7 +46,7 @@ $ pkg-config --cflags --libs katana  # print both
 For example:
 
 ```bash
-$ gcc examples/dump_css.c `pkg-config --cflags --libs katana` -o dump
+$ gcc examples/dump_stylesheet.c `pkg-config --cflags --libs katana` -o dump
 ```
 
 If package katana was **not found in the pkg-config** search path, perhaps you should add the directory containing `katana.pc` to the `PKG_CONFIG_PATH` environment variable as following:
