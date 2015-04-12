@@ -17,6 +17,8 @@ DerivedData
 *.ipa
 *.xcuserstate
 
+examples/Objective-C
+
 # CocoaPods
 #
 # We recommend against adding the Pods directory to your .gitignore. However
