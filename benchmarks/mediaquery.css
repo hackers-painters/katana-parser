@@ -1,0 +1,24 @@
+
+@media screen and (color), projection and (color) {
+  .hidden-lg,
+  tr.hidden-lg,
+  th.hidden-lg,
+  td.hidden-lg {
+    display: none !important;
+    position: relative;
+    font-size: 75%;
+    line-height: 0;
+    vertical-align: baseline;
+    content: " (" attr(href) ")";
+    border: 1px solid #999;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-transition: all 0.2s ease-in-out;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .selector{
+    property: value;
+  }
+}
