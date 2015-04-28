@@ -18,6 +18,9 @@ DerivedData
 *.xcuserstate
 
 examples/Objective-C
+benchmarks/*.css
+src/generate
+todo.list
 
 # CocoaPods
 #
