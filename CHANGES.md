@@ -25,7 +25,10 @@ Katana 0.6.0
 * Changed the public api.
 
 Katana 0.7.0
-* Added automake for project
+* Added automake for project.
 
 Katana 0.8.0 (2015-4-7)
 * Initial release open-sourced by QFish.
+
+Katana 0.8.1 (2015-4-29)
+* Supported more standard pseudos.

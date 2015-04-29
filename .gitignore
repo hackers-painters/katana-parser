@@ -21,6 +21,7 @@ examples/Objective-C
 benchmarks/*.css
 src/generate
 todo.list
+temp
 
 # CocoaPods
 #
@@ -29,3 +30,4 @@ todo.list
 # http://guides.cocoapods.org/using/using-cocoapods.html#should-i-ignore-the-pods-directory-in-source-control
 #
 #Pods/
+css

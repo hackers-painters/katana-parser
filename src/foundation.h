@@ -72,6 +72,8 @@ const char* katana_string_to_characters_with_prefix_char(struct KatanaInternalPa
     
 // Appends a string onto the end of the KatanaParserString.
 void katana_string_append_string(struct KatanaInternalParser* parser, KatanaParserString* str, KatanaParserString* output);
+// Returns a bool value that indicates whether a given string matches the beginning characters of the receiver.
+bool katana_string_has_prefix(const char* str, const char* prefix);
 
 /**
  *  Number

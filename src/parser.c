@@ -1359,6 +1359,9 @@ void katana_print_stylesheet(KatanaParser* parser, KatanaStylesheet* sheet)
 {
     katana_print("stylesheet with ");
     katana_print("%d rules.\n", sheet->rules.length);
+    for (size_t i = 0; i < sheet->imports.length; ++i) {
+        katana_print_rule(parser, sheet->imports.data[i]);
+    }
     for (size_t i = 0; i < sheet->rules.length; ++i) {
         katana_print_rule(parser, sheet->rules.data[i]);
     }
@@ -1402,7 +1405,7 @@ void katana_print_import_rule(KatanaParser* parser, KatanaImportRule* rule)
 {
     katana_print("@%s ", rule->base.name);
     katana_print("url(%s)", rule->href);
-    katana_print(";");
+    katana_print(";\n");
 }
 
 void katana_print_keyframes_rule(KatanaParser* parser, KatanaKeyframesRule* rule)
