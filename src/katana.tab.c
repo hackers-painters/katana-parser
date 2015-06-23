@@ -2367,7 +2367,7 @@ yyreduce:
 
   case 65:
 
-    { katana_string_clear(parser, &(yyval.string)); }
+    { /*$$.clear()*/ }
 
     break;
 
