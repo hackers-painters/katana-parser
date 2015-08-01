@@ -316,7 +316,7 @@ KatanaParserString* katana_selector_to_string(KatanaParser* parser, KatanaSelect
                 case KatanaPseudoHostContext: {
                     if ( cs->data->selectors ) {
                         KatanaArray* sels = cs->data->selectors;
-                        for (int i=0; i<sels->length; i++) {
+                        for (size_t i=0; i<sels->length; i++) {
                             KatanaParserString* str = katana_selector_to_string(parser, sels->data[i], NULL);
                             katana_string_append_string(parser, str, string);
                             katana_parser_deallocate(parser, (void*) str->data);
@@ -451,7 +451,7 @@ unsigned calc_specificity_for_one_selector(const KatanaSelector* selector)
             return 0x100;
             
         case KatanaSelectorMatchTag:
-            return !strcasecmp(selector->tag->local, "*") ? 1 : 0;
+            return !strcasecmp(selector->tag->local, "*") ? 0 : 1;
         case KatanaSelectorMatchUnknown:
         case KatanaSelectorMatchPagePseudoClass:
             return 0;
@@ -486,6 +486,7 @@ unsigned katana_calc_specificity_for_selector(KatanaSelector* selector)
         else
             total = temp;
     }
+        
     return total;
 }
 
