@@ -101,7 +101,6 @@ void katana_string_to_lowercase(struct KatanaInternalParser* parser,
 }
 
 
-#pragma mark - String
 
 const char* katana_string_to_characters(struct KatanaInternalParser * parser, const KatanaParserString* str)
 {

@@ -385,7 +385,7 @@ typedef struct {
     } bits;
     KatanaQualifiedName* attribute;
     const char* argument; // Used for :contains, :lang, :nth-*
-    KatanaArray* selectors; ; // Used for :any and :not
+    KatanaArray* selectors; // Used for :any and :not
 } KatanaSelectorRareData;
 
 typedef struct KatanaSelector {

@@ -219,7 +219,7 @@ double katana_characters_to_double(const char* data, size_t length, bool* ok)
         return 0.0;
     }
     
-    char bytes[length + 1];
+    char* bytes = malloc(sizeof(char) * (length + 1));
     for (unsigned i = 0; i < length; ++i)
         bytes[i] = data[i] < 0x7F ? data[i] : '?';
     bytes[length] = '\0';
@@ -227,6 +227,7 @@ double katana_characters_to_double(const char* data, size_t length, bool* ok)
     double val = strtod(bytes, &end);
     if (ok)
         *ok = (end == 0 || *end == '\0');
+	free(bytes);
     return val;
 }
 
