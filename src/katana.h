@@ -175,6 +175,8 @@ typedef enum {
     KATANA_VALUE_PERCENTAGE = 2,
     KATANA_VALUE_EMS = 3,
     KATANA_VALUE_EXS = 4,
+
+	// double
     KATANA_VALUE_PX = 5,
     KATANA_VALUE_CM = 6,
     KATANA_VALUE_MM = 7,
@@ -401,10 +403,17 @@ typedef struct KatanaSelector {
 unsigned katana_calc_specificity_for_selector(KatanaSelector* selector);
 
 typedef struct {
+	// property name
     const char* property;
-    KatanaArray* values;
+	
+	// property value
+    KatanaArray* /* KatanaValue */ values;
     const char* string;
+
+	// is this property marked important
     bool important;
+
+	// origin css text of the property
     const char* raw;
 } KatanaDeclaration;
 
@@ -452,13 +461,23 @@ typedef struct {
  * Parser mode
  */
 typedef enum KatanaParserMode {
+	// Normal CSS content used in External CSS files or Internal CSS, may include more than 1 css rules.
     KatanaParserModeStylesheet,
+
+	// Single CSS rule like "@import", "selector{...}"
     KatanaParserModeRule,
+
     KatanaParserModeKeyframeRule,
     KatanaParserModeKeyframeKeyList,
     KatanaParserModeMediaList,
+
+	// CSS property value like "1px", "1em", "#eee"
     KatanaParserModeValue,
+
+	// CSS selector like ".pages.active"
     KatanaParserModeSelector,
+
+	// Inline stylesheet like "width: 20px; height: 20px;"
     KatanaParserModeDeclarationList,
 } KatanaParserMode;
     
@@ -472,7 +491,7 @@ typedef struct KatanaInternalOutput {
         KatanaArray* keyframe_keys;
         KatanaArray* values;
         KatanaArray* medias;
-        KatanaArray* declarations;
+        KatanaArray* /* KatanaDeclaration */ declarations;
         KatanaArray* selectors;
     };
     KatanaParserMode mode;

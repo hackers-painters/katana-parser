@@ -10,6 +10,7 @@
 #include "parser.h"
 
 #include <string.h>
+#include <strings.h>
 #include <stdbool.h>
 #include <assert.h>
 

@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+﻿/* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
@@ -39,6 +39,8 @@
    There are some unavoidable exceptions within include files to
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
+
+#include <strings.h>
 
 /* Identify Bison output.  */
 #define YYBISON 1

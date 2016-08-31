@@ -77,7 +77,7 @@ void katana_destroy_array_using_deallocator(KatanaParser* parser,
 extern int katanaparse(void* scanner, struct KatanaInternalParser * parser);
 
 static KatanaOutput* katana_parse_with_options(const KatanaOptions* options,
-                                               const char* bytes,
+                                               yyconst char* bytes,
                                                size_t len,
                                                KatanaParserMode mode);
 
@@ -188,7 +188,7 @@ KatanaOutput* katana_parse(const char* str, size_t len, KatanaParserMode mode)
 {
     switch (mode) {
         case KatanaParserModeStylesheet:
-            return katana_parse_with_options(&kKatanaDefaultOptions, str, len, mode);
+            return katana_parse_with_options(&kKatanaDefaultOptions, (yyconst char*)str, len, mode);
         case KatanaParserModeRule:
         case KatanaParserModeKeyframeRule:
         case KatanaParserModeKeyframeKeyList:
@@ -201,7 +201,7 @@ KatanaOutput* katana_parse(const char* str, size_t len, KatanaParserMode mode)
         }
         default:
             katana_print("Whoops, not support yet!");
-            break;
+            return NULL;
     }
 }
 
@@ -261,7 +261,7 @@ static KatanaOutput* katana_parse_fragment(const char* prefix,
 }
 
 static KatanaOutput* katana_parse_with_options(const KatanaOptions* options,
-                                               const char* bytes,
+                                               yyconst char* bytes,
                                                size_t len,
                                                KatanaParserMode mode) {
     assert(NULL != bytes);
