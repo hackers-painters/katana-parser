@@ -31,3 +31,8 @@ temp
 #
 #Pods/
 css
+
+# Visual Studio
+visualc/x64
+visualc/Debug
+visualc/Release
