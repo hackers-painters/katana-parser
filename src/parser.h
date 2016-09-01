@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright (c) 2015 QFish <im@qfi.sh>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,7 +36,6 @@ extern "C" {
 #define KATANA_PARSER_DEBUG          0
 #define KATANA_PARSER_LOG_ENABLE     0
     
-#pragma mark - Parser
 
 struct KatanaInternalOutput;
 struct KatanaInternalOptions;
@@ -75,24 +74,19 @@ typedef struct KatanaInternalParser {
     
 } KatanaParser;
     
-#pragma mark - Vector
 
 KatanaArray* katana_new_array(KatanaParser* parser);
 
-#pragma mark - Stylesheet
 
 KatanaStylesheet* katana_new_stylesheet(KatanaParser* parser);
 void katana_parser_reset_declarations(KatanaParser* parser);
 
-#pragma mark - @namespace
 
 void katana_add_namespace(KatanaParser* parser, KatanaParserString* prefix, KatanaParserString* uri);
 
-#pragma mark - @fontface
 
 KatanaRule* katana_new_font_face(KatanaParser* parser);
 
-#pragma mark - @keyframes
 
 KatanaRule* katana_new_keyframes_rule(KatanaParser* parser, KatanaParserString* name, KatanaArray* keyframes, bool isPrefixed);
 KatanaKeyframe* katana_new_keyframe(KatanaParser* parser, KatanaArray* selectors);
@@ -100,15 +94,12 @@ KatanaArray* katana_new_Keyframe_list(KatanaParser* parser);
 void katana_keyframe_rule_list_add(KatanaParser* parser, KatanaKeyframe* keyframe, KatanaArray* list);
 void katana_parser_clear_keyframes(KatanaParser* parser, KatanaArray* keyframes);
 
-#pragma mark - @charset
 
 void katana_set_charset(KatanaParser* parser, KatanaParserString* charset);
 
-#pragma mark - @import
 
 KatanaRule* katana_new_import_rule(KatanaParser* parser, KatanaParserString* href, KatanaArray* media);
 
-#pragma mark - Value
 
 KatanaValue* katana_new_value(KatanaParser* parser);
 KatanaValue* katana_new_dimension_value(KatanaParser* parser, KatanaParserNumber* value, KatanaValueUnit unit);
@@ -121,46 +112,37 @@ KatanaValue* katana_new_list_value(KatanaParser* parser, KatanaArray* list);
 void katana_value_set_string(KatanaParser* parser, KatanaValue* value, KatanaParserString* string);
 void katana_value_set_sign(KatanaParser* parser, KatanaValue* value, int sign);
 
-#pragma mark - ValueList
 
 KatanaArray* katana_new_value_list(KatanaParser* parser);
 void katana_value_list_add(KatanaParser* parser, KatanaValue* value, KatanaArray* list);
 void katana_value_list_insert(KatanaParser* parser, KatanaValue* value, int index, KatanaArray* list);
 void katana_value_list_steal_values(KatanaParser* parser, KatanaArray* values, KatanaArray* list);
 
-#pragma mark - @media
 
 KatanaRule* katana_new_media_rule(KatanaParser* parser, KatanaArray* medias, KatanaArray* rules);
 
-#pragma mark - MediaList
 
 KatanaArray* katana_new_media_list(KatanaParser* parser);
 void katana_media_list_add(KatanaParser* parser, KatanaMediaQuery* media_query, KatanaArray* medias);
 
-#pragma mark - MediaQuery
 
 KatanaMediaQuery* katana_new_media_query(KatanaParser* parser, KatanaMediaQueryRestrictor r, KatanaParserString *type, KatanaArray* exps);
 
-#pragma mark - MedaiQueryExp
 
 // i.e. (min-width: 960px)
 KatanaMediaQueryExp * katana_new_media_query_exp(KatanaParser* parser, KatanaParserString* feature, KatanaArray* values);
 
-#pragma mark - MedaiQueryExp List
 
 KatanaArray* katana_new_media_query_exp_list(KatanaParser* parser);
 void katana_media_query_exp_list_add(KatanaParser* parser, KatanaMediaQueryExp* exp, KatanaArray* list);
 
-#pragma mark - RuleList
 
 KatanaArray* katana_new_rule_list(KatanaParser* parser);
 KatanaArray* katana_rule_list_add(KatanaParser* parser, KatanaRule* rule, KatanaArray* rule_list);
 
-#pragma mark - StyleRule
 
 KatanaRule* katana_new_style_rule(KatanaParser* parser, KatanaArray* selectors);
 
-#pragma mark - Property
 
 void katana_start_declaration(KatanaParser* parser);
 void katana_end_declaration(KatanaParser* parser, bool flag, bool ended);
@@ -168,7 +150,6 @@ void katana_set_current_declaration(KatanaParser* parser, KatanaParserString* ta
 bool katana_new_declaration(KatanaParser* parser, KatanaParserString* name, bool important, KatanaArray* values);
 void katana_parser_clear_declarations(KatanaParser* parser);
 
-#pragma mark - Selector
 
 void katana_start_selector(KatanaParser* parser);
 void katana_end_selector(KatanaParser* parser);
@@ -200,7 +181,6 @@ bool katana_parse_attribute_match_type(KatanaParser* parser, KatanaAttributeMatc
 bool katana_selector_is_simple(KatanaParser* parser, KatanaSelector* selector);
 void katana_selector_extract_pseudo_type(KatanaSelector* selector);
     
-#pragma mark - Universal rule parse flow
 
 void katana_add_rule(KatanaParser* parser, KatanaRule* rule);
 
@@ -212,12 +192,10 @@ void katana_end_rule_header(KatanaParser* parser);
 void katana_end_invalid_rule_header(KatanaParser* parser);
 void katana_start_rule_body(KatanaParser* parser);
 
-#pragma mark - String
 
 bool katana_string_is_function(KatanaParserString* string);
 void katana_string_clear(KatanaParser* parser, KatanaParserString* string);
 
-#pragma mark - Fragment
     
 void katana_parse_internal_rule(KatanaParser* parser, KatanaRule* e);
 void katana_parse_internal_keyframe_rule(KatanaParser* parser, KatanaKeyframe* e);
@@ -227,7 +205,6 @@ void katana_parse_internal_media_list(KatanaParser* parser, KatanaArray* e);
 void katana_parse_internal_declaration_list(KatanaParser* parser, bool e);
 void katana_parse_internal_selector(KatanaParser* parser, KatanaArray* e);
     
-#pragma mark - Debug
 
 // Bison error
 void katanaerror(KATANALTYPE* yyloc, void* scanner, KatanaParser * parser, char*);
