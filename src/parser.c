@@ -346,7 +346,7 @@ KatanaArray* katana_new_array(KatanaParser* parser) {
 
 void katana_destroy_array_using_deallocator(KatanaParser* parser,
                           KatanaArrayDeallocator callback, KatanaArray* array) {
-    assert(NULL != array);
+    //assert(NULL != array);
     if ( NULL == array )
         return;
     for (size_t i = 0; i < array->length; ++i) {
