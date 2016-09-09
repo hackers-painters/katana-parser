@@ -3691,7 +3691,11 @@ yyreduce:
 
   case 236:
 
-    { (yyval.value) = katana_new_value(parser); (yyval.value)->id = KatanaValueInvalid; (yyval.value)->string = "#"; (yyval.value)->isInt = false; (yyval.value)->unit = KATANA_VALUE_PARSER_HEXCOLOR; }
+    { (yyval.value) = katana_new_value(parser); (yyval.value)->id = KatanaValueInvalid; 
+    //(yyval.value)->string = "#"; 
+    KatanaParserString tmp = {"#", 1};
+    katana_value_set_string(parser, yyval.value, &tmp); 
+    (yyval.value)->isInt = false; (yyval.value)->unit = KATANA_VALUE_PARSER_HEXCOLOR; }
 
     break;
 
