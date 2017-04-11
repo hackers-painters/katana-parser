@@ -21,7 +21,6 @@
  */
 
 #include "selector.h"
-#include "util.h"
 #include <string.h>
 #include <assert.h>
 #include <strings.h>
