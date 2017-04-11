@@ -30,7 +30,7 @@ To build and install the library, issue the standard UNIX incantation from the r
 
 ```bash
 $ ./autogen.sh
-$ ./configure
+$ ./configure CFLAGS="-std=c99"
 $ make
 $ sudo make install
 ```
