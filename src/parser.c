@@ -1261,6 +1261,15 @@ void katanaerror(YYLTYPE* yyloc, void* scanner, struct KatanaInternalParser * pa
 #endif // #if KATANA_PARSER_DEBUG
 #endif // #ifdef KATANA_PARSER_DEBUG
 
+    KatanaError *e = (KatanaError *)malloc(sizeof(KatanaError));
+    e->type = KatanaParseError;
+    e->first_line = yyloc->first_line;
+    e->first_column = yyloc->first_column;
+    e->last_line = yyloc->last_line;
+    e->last_column = yyloc->last_column;
+    snprintf(e->message, KATANA_ERROR_MESSAGE_SIZE, "%s at %s", error,
+             katanaget_text(parser->scanner));
+    katana_array_add(parser, e, &(parser->output->errors));
 }
 
 void katana_parser_log(KatanaParser* parser, const char * format, ...)
