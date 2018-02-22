@@ -33,6 +33,8 @@
 extern "C" {
 #endif
 
+#define KATANA_ERROR_MESSAGE_SIZE 100
+
 typedef enum {
     KatanaRuleUnkown,
     KatanaRuleStyle,
@@ -252,6 +254,8 @@ typedef enum {
     KatanaValueCustom = 0x100010,
 } KatanaValueID;
 
+typedef enum { KatanaParseError } KatanaErrorType;
+
 typedef struct {
     const char* local; // tag local name
     const char* prefix; // namesapce identifier
@@ -448,8 +452,12 @@ typedef struct {
 } KatanaCharsetRule;
     
 typedef struct {
-    int code;
-    const char* message;
+    KatanaErrorType type;
+    int first_line;
+    int first_column;
+    int last_line;
+    int last_column;
+    char message[KATANA_ERROR_MESSAGE_SIZE];
 } KatanaError;
 
 // TODO: @document
