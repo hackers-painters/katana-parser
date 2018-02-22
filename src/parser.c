@@ -997,6 +997,7 @@ KatanaSelector* katana_new_selector(KatanaParser* parser)
     selector->data = katana_new_rare_data(parser);
     selector->tag = NULL;
     selector->match = 0;
+    selector->pseudo = KatanaPseudoNotParsed;
     selector->relation = 0;
     selector->specificity = 0;
     selector->tag = NULL;

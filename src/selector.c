@@ -65,7 +65,7 @@ KatanaPseudoType katana_parse_pseudo_type(const char* name, bool hasArguments)
 
 void katana_selector_extract_pseudo_type(KatanaSelector* selector)
 {
-    if (selector->pseudo == KatanaPseudoUnknown)
+    if (selector->pseudo == KatanaPseudoNotParsed)
         selector->pseudo = KatanaPseudoUnknown;
     
     if (selector->match != KatanaSelectorMatchPseudoClass && selector->match != KatanaSelectorMatchPseudoElement && selector->match != KatanaSelectorMatchPagePseudoClass)
