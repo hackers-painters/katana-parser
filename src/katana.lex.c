@@ -3105,7 +3105,8 @@ static void katana_load_buffer_state  (yyscan_t yyscanner)
 	b = (YY_BUFFER_STATE) katanaalloc(sizeof( struct yy_buffer_state ) ,yyscanner );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in katana_create_buffer()" );
-
+	    
+	memset(b, 0, sizeof(struct yy_buffer_state));
 	b->yy_buf_size = size;
 
 	/* yy_ch_buf has to be 2 characters longer than the size given because
@@ -3320,6 +3321,7 @@ YY_BUFFER_STATE katana_scan_buffer  (char * base, yy_size_t  size , yyscan_t yys
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in katana_scan_buffer()" );
 
+	memset(b, 0, sizeof(struct yy_buffer_state));	
 	b->yy_buf_size = size - 2;	/* "- 2" to take care of EOB's */
 	b->yy_buf_pos = b->yy_ch_buf = base;
 	b->yy_is_our_buffer = 0;
