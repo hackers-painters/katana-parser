@@ -39,7 +39,7 @@
 //#define assert(x)
 
 #define breakpoint
-#define KATANA_PARSER_STRING(literal) { literal, sizeof(literal) - 1 }
+#define KATANA_PARSER_STRING(literal) (KatanaParserString){ literal, sizeof(literal) - 1 }
 
 
 typedef void (*KatanaArrayDeallocator)(KatanaParser* parser, void* e);
@@ -54,6 +54,7 @@ void katana_destroy_stylesheet(KatanaParser* parser, KatanaStylesheet* e);
 void katana_destroy_rule(KatanaParser* parser, KatanaRule* e);
 void katana_destroy_font_face_rule(KatanaParser* parser, KatanaFontFaceRule* e);
 void katana_destroy_import_rule(KatanaParser* parser, KatanaImportRule* e);
+void katana_destroy_supports_rule(KatanaParser* parser, KatanaSupportsRule* e);
 void katana_destroy_media_rule(KatanaParser* parser, KatanaMediaRule* e);
 void katana_destroy_media_query(KatanaParser* parser, KatanaMediaQuery* e);
 void katana_destroy_media_query_exp(KatanaParser* parser, KatanaMediaQueryExp* e);
@@ -68,6 +69,7 @@ void katana_destroy_rare_data(KatanaParser* parser, KatanaSelectorRareData* e);
 void katana_destroy_declaration(KatanaParser* parser, KatanaDeclaration* e);
 void katana_destroy_value(KatanaParser* parser, KatanaValue* e);
 void katana_destroy_function(KatanaParser* parser, KatanaValueFunction* e);
+void katana_destroy_error(KatanaParser* parser, KatanaError* e);
 
 void katana_destroy_array_using_deallocator(KatanaParser* parser,
                           KatanaArrayDeallocator deallocator, KatanaArray* array);
@@ -168,7 +170,7 @@ void katana_destroy_output(KatanaOutput* output)
             break;
     }
     katana_destroy_stylesheet(&parser, output->stylesheet);
-    katana_array_destroy(&parser, &output->errors);
+    katana_destroy_array(&parser, katana_destroy_error, &output->errors);
     katana_parser_deallocate(&parser, output);
 }
 
@@ -346,9 +348,9 @@ KatanaArray* katana_new_array(KatanaParser* parser) {
 
 void katana_destroy_array_using_deallocator(KatanaParser* parser,
                           KatanaArrayDeallocator callback, KatanaArray* array) {
-    //assert(NULL != array);
-    if ( NULL == array )
-        return;
+    
+    if ( NULL == array ) return;
+    
     for (size_t i = 0; i < array->length; ++i) {
         callback(parser, array->data[i]);
     }
@@ -367,25 +369,17 @@ KatanaStylesheet* katana_new_stylesheet(KatanaParser* parser) {
 
 void katana_destroy_stylesheet(KatanaParser* parser, KatanaStylesheet* e)
 {
-    assert(NULL != e);
-    if ( NULL == e )
-        return;
+    if ( NULL == e ) return;
     
     // free encoding
     if ( e->encoding )
         katana_parser_deallocate(parser, (void*) e->encoding);
 
     // free imports
-    for (size_t i = 0; i < e->imports.length; ++i) {
-        katana_destroy_import_rule(parser, e->imports.data[i]);
-    }
-    katana_parser_deallocate(parser, (void*) e->imports.data);
+    katana_destroy_array(parser, katana_destroy_import_rule, &e->imports);
 
     // free rules
-    for (size_t i = 0; i < e->rules.length; ++i) {
-        katana_destroy_rule(parser, e->rules.data[i]);
-    }
-    katana_parser_deallocate(parser, (void*) e->rules.data);
+    katana_destroy_array(parser, katana_destroy_rule, &e->rules);
 
     // free e
     katana_parser_deallocate(parser, (void*) e);
@@ -409,7 +403,9 @@ void katana_destroy_rule(KatanaParser* parser, KatanaRule* rule)
         case KatanaRuleMedia:
             katana_destroy_media_rule(parser, (KatanaMediaRule*)rule);
             break;
-            
+        case KatanaRuleSupports:
+            katana_destroy_supports_rule(parser, (KatanaSupportsRule*)rule);
+            break;
         default:
             break;
     }
@@ -429,7 +425,7 @@ KatanaRule* katana_new_style_rule(KatanaParser* parser, KatanaArray* selectors)
         return NULL;
     
     KatanaStyleRule* rule = katana_parser_allocate(parser, sizeof(KatanaStyleRule));
-    rule->base.name = "style";
+    rule->base.name = katana_copy_string(parser, "style");
     rule->base.type = KatanaRuleStyle;
     rule->selectors = selectors;
     // Do not check parser->parsed_declarations, when we encounter something like `selectors {}`, treat it as valid.
@@ -441,18 +437,42 @@ KatanaRule* katana_new_style_rule(KatanaParser* parser, KatanaArray* selectors)
 
 void katana_destroy_style_rule(KatanaParser* parser, KatanaStyleRule* e)
 {
-    assert(e->selectors->length);
-
     katana_destroy_array(parser, katana_destroy_selector, e->selectors);
     katana_parser_deallocate(parser, (void*) e->selectors);
-
+    
     katana_destroy_array(parser, katana_destroy_declaration, e->declarations);
     katana_parser_deallocate(parser, (void*) e->declarations);
     
-    // katana_parser_deallocate(parser, (void*) e->base.name);
+    katana_parser_deallocate(parser, (void*) e->base.name);
     katana_parser_deallocate(parser, (void*) e);
 }
 
+KatanaRule* katana_new_supports_rule(KatanaParser* parser, bool supported, KatanaArray* rules)
+{
+    KatanaSupportsRule* rule = katana_parser_allocate(parser, sizeof(KatanaSupportsRule));
+    rule->base.name = katana_copy_string(parser, "supports");
+    rule->base.type = KatanaRuleSupports;
+    rule->supported = supported;
+    rule->rules = rules;
+    return (KatanaRule*)rule;
+}
+
+void katana_destroy_supports_rule(KatanaParser* parser, KatanaSupportsRule* e)
+{
+    katana_destroy_rule_list(parser,  (void*) e->rules);
+    katana_parser_deallocate(parser, (void*) e->base.name);
+    katana_parser_deallocate(parser, (void*) e);
+}
+
+bool katana_support_feature(KatanaParser* parser, KatanaParserString* feature, KatanaArray* values)
+{
+    // TODO: check feature support
+    
+    katana_destroy_array(parser, katana_destroy_value, (void*) values);
+    katana_parser_deallocate(parser, (void*) values);
+    
+    return false;
+}
 
 void katana_add_namespace(KatanaParser* parser, KatanaParserString* prefix, KatanaParserString* uri)
 {
@@ -463,7 +483,7 @@ void katana_add_namespace(KatanaParser* parser, KatanaParserString* prefix, Kata
 KatanaRule* katana_new_font_face(KatanaParser* parser)
 {
     KatanaFontFaceRule* rule = katana_parser_allocate(parser, sizeof(KatanaFontFaceRule));
-    rule->base.name = "font-face";
+    rule->base.name = katana_copy_string(parser, "font-face");
     rule->base.type = KatanaRuleFontFace;
     rule->declarations = parser->parsed_declarations;
 
@@ -476,7 +496,7 @@ void katana_destroy_font_face_rule(KatanaParser* parser, KatanaFontFaceRule* e)
 {
     katana_destroy_array(parser, katana_destroy_declaration, e->declarations);
     katana_parser_deallocate(parser, (void*) e->declarations);
-    // katana_parser_deallocate(parser, (void*) e->base.name);
+    katana_parser_deallocate(parser, (void*) e->base.name);
     katana_parser_deallocate(parser, (void*) e);
 }
 
@@ -484,7 +504,7 @@ void katana_destroy_font_face_rule(KatanaParser* parser, KatanaFontFaceRule* e)
 KatanaRule* katana_new_keyframes_rule(KatanaParser* parser, KatanaParserString* name, KatanaArray* keyframes, bool isPrefixed)
 {
     KatanaKeyframesRule * rule = katana_parser_allocate(parser, sizeof(KatanaKeyframesRule));
-    rule->base.name = "keyframes";
+    rule->base.name = katana_copy_string(parser, "keyframes");
     rule->base.type = KatanaRuleKeyframes;
     rule->name = katana_string_to_characters(parser, name);
     rule->keyframes = keyframes;
@@ -538,14 +558,14 @@ void katana_parser_clear_keyframes(KatanaParser* parser, KatanaArray* keyframes)
 
 void katana_set_charset(KatanaParser* parser, KatanaParserString* charset)
 {
-//    parser->output->stylesheet->encoding = katana_string_to_characters(parser, charset);
+    parser->output->stylesheet->encoding = katana_string_to_characters(parser, charset);
 }
 
 
 KatanaRule* katana_new_import_rule(KatanaParser* parser, KatanaParserString* href, KatanaArray* media)
 {
     KatanaImportRule* rule = katana_parser_allocate(parser, sizeof(KatanaImportRule));
-    rule->base.name = "import";
+    rule->base.name = katana_copy_string(parser, "import");
     rule->base.type = KatanaRuleImport;
     rule->href = katana_string_to_characters(parser, href);
     rule->medias = media;
@@ -556,7 +576,7 @@ void katana_destroy_import_rule(KatanaParser* parser, KatanaImportRule* e)
 {
     katana_destroy_array(parser, katana_destroy_media_query, e->medias);
     katana_parser_deallocate(parser, (void*) e->medias);
-    // katana_parser_deallocate(parser, (void*) e->base.name);
+    katana_parser_deallocate(parser, (void*) e->base.name);
     katana_parser_deallocate(parser, (void*) e->href);
     katana_parser_deallocate(parser, (void*) e);
 }
@@ -643,6 +663,13 @@ void katana_destroy_function(KatanaParser* parser, KatanaValueFunction* e)
     katana_parser_deallocate(parser, (void*) e->args);
     katana_parser_deallocate(parser, (void*) e->name);
     katana_parser_deallocate(parser, (void*) e);
+}
+
+void katana_destroy_error(KatanaParser* parser, KatanaError* e)
+{
+    if ( e ) {
+        katana_parser_deallocate(parser, (void*) e);
+    }
 }
 
 KatanaValue* katana_new_number_value(KatanaParser* parser, int sign, KatanaParserNumber* value, KatanaValueUnit unit)
@@ -797,16 +824,12 @@ void katana_parser_reset_declarations(KatanaParser* parser)
     parser->parsed_declarations = katana_new_array(parser);
 }
 
-
 KatanaRule* katana_new_media_rule(KatanaParser* parser, KatanaArray* medias, KatanaArray* rules)
 {
-//	assert(NULL != medias && NULL != rules);
-    
-    if ( medias == NULL || rules == NULL )
-        return NULL;
+    if ( medias == NULL || rules == NULL ) return NULL;
     
     KatanaMediaRule* rule = katana_parser_allocate(parser, sizeof(KatanaMediaRule));
-    rule->base.name = "media";
+    rule->base.name = katana_copy_string(parser, "media");
     rule->base.type = KatanaRuleMedia;
     rule->medias = medias;
     rule->rules = rules;
@@ -816,8 +839,8 @@ KatanaRule* katana_new_media_rule(KatanaParser* parser, KatanaArray* medias, Kat
 void katana_destroy_media_rule(KatanaParser* parser, KatanaMediaRule* e)
 {
     katana_destroy_media_list(parser, (void*) e->medias);
-    katana_destroy_rule_list(parser,  (void*) e->rules),
-    // katana_parser_deallocate(parser,  (void*) e->base.name);
+    katana_destroy_rule_list(parser,  (void*) e->rules);
+    katana_parser_deallocate(parser,  (void*) e->base.name);
     katana_parser_deallocate(parser,  (void*) e);
 }
 
@@ -829,8 +852,7 @@ KatanaArray* katana_new_media_list(KatanaParser* parser)
 
 void katana_media_list_add(KatanaParser* parser, KatanaMediaQuery* media_query, KatanaArray* medias)
 {
-    // debug here
-//    katana_print_media_query(parser, media_query);
+    //katana_print_media_query(parser, media_query);
     if ( NULL != media_query ) {
         katana_array_add(parser, media_query, medias);
     }
@@ -917,7 +939,6 @@ KatanaArray* katana_rule_list_add(KatanaParser* parser, KatanaRule* rule, Katana
     
     return rule_list;
 }
-
 
 void katana_start_declaration(KatanaParser* parser)
 {
@@ -1126,11 +1147,6 @@ KatanaArray* katana_new_selector_list(KatanaParser* parser)
     return katana_new_array(parser);
 }
 
-KatanaArray* katana_reusable_selector_list(KatanaParser* parser)
-{
-    return katana_new_array(parser);
-}
-
 void katana_selector_list_shink(KatanaParser* parser, int capacity, KatanaArray* list)
 {
 
@@ -1227,6 +1243,15 @@ void katana_start_rule_body(KatanaParser* parser)
     katana_parser_log(parser, "katana_start_rule_body");
 }
 
+void katana_start_media_query(KatanaParser* parser)
+{
+    katana_parser_log(parser, "katana_start_media_query");
+}
+
+void katana_end_media_query(KatanaParser* parser)
+{
+    katana_parser_log(parser, "katana_start_media_query");
+}
 
 bool katana_string_is_function(KatanaParserString* string)
 {
@@ -1235,7 +1260,6 @@ bool katana_string_is_function(KatanaParserString* string)
 
 void katana_string_clear(KatanaParser* parser, KatanaParserString* string)
 {
-	printf("==%s==\n", string->data);
     katana_parser_deallocate(parser, (void*) string->data);
     katana_parser_deallocate(parser, (void*) string);
 }
@@ -1376,6 +1400,7 @@ void katana_print_rule(KatanaParser* parser, KatanaRule* rule)
             katana_print_media_rule(parser, (KatanaMediaRule*)rule);
             break;
         case KatanaRuleSupports:
+            katana_print_supports_rule(parser, (KatanaSupportsRule*)rule);
             break;
         case KatanaRuleUnkown:
             break;
@@ -1390,6 +1415,22 @@ void katana_print_import_rule(KatanaParser* parser, KatanaImportRule* rule)
     katana_print("@%s ", rule->base.name);
     katana_print("url(%s)", rule->href);
     katana_print(";\n");
+}
+
+void katana_print_supports_rule(KatanaParser* parser, KatanaSupportsRule* rule)
+{
+    katana_print("@%s ", rule->base.name);
+    katana_print("%s ", rule->supports);
+    
+    if ( rule->rules->length ) {
+        katana_print(" {\n");
+        for (size_t i = 0; i < rule->rules->length; ++i) {
+            katana_print_rule(parser, rule->rules->data[i]);
+        }
+        katana_print("}\n");
+    } else {
+        katana_print(";\n");
+    }
 }
 
 void katana_print_keyframes_rule(KatanaParser* parser, KatanaKeyframesRule* rule)
@@ -1501,7 +1542,7 @@ void katana_print_media_rule(KatanaParser* parser, KatanaMediaRule* rule)
     if ( rule->medias->length ) {
         katana_print(" {\n");
         for (size_t i = 0; i < rule->rules->length; ++i) {
-            katana_print_style_rule(parser, rule->rules->data[i]);
+            katana_print_rule(parser, rule->rules->data[i]);
         }
         katana_print("}\n");
     } else {

@@ -278,6 +278,7 @@ static char * katana_token_string(int tok)
     }
     else
     {
+        // leak when KATANA_FELX_DEBUG
         char* unicode = malloc(2);
         unicode[0] = (char)tok;
         unicode[1] = '\0';

@@ -128,6 +128,12 @@ const char* katana_string_to_characters_with_prefix_char(struct KatanaInternalPa
     return buffer;
 }
 
+char* katana_copy_string(struct KatanaInternalParser* parser, const char* str) {
+  char* buffer = katana_parser_allocate(parser, strlen(str) + 1);
+  strcpy(buffer, str);
+  return buffer;
+}
+
 /**
  * Array
  */

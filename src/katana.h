@@ -38,13 +38,14 @@ extern "C" {
 typedef enum {
     KatanaRuleUnkown,
     KatanaRuleStyle,
+    KatanaRuleCharset,
     KatanaRuleImport,
     KatanaRuleMedia,
     KatanaRuleFontFace,
-    KatanaRuleSupports,
+    KatanaRulePage,
     KatanaRuleKeyframes,
-    KatanaRuleCharset,
-    KatanaRuleHost,
+    KatanaRuleViewPort,
+    KatanaRuleSupports
 } KatanaRuleType;
 
 typedef enum {
@@ -52,6 +53,13 @@ typedef enum {
     KatanaMediaQueryRestrictorOnly,
     KatanaMediaQueryRestrictorNot,
 } KatanaMediaQueryRestrictor;
+
+typedef enum {
+    KatanaSupportOperatorNone,
+    KatanaSupportOperatorNOT,
+    KatanaSupportOperatorOR,
+    KatanaSupportOperatorAND
+} KatanaSupportOperator;
 
 typedef enum {
     KatanaSelectorMatchUnknown = 0,
@@ -165,6 +173,25 @@ typedef enum {
     KatanaPseudoSpatialNavigationFocus,
     KatanaPseudoListBox
 } KatanaPseudoType;
+
+typedef enum  {
+    KatanaTopLeftCornerMarginBox,
+    KatanaTopLeftMarginBox,
+    KatanaTopCenterMarginBox,
+    KatanaTopRightMarginBox,
+    KatanaTopRightCornerMarginBox,
+    KatanaBottomLeftCornerMarginBox,
+    KatanaBottomLeftMarginBox,
+    KatanaBottomCenterMarginBox,
+    KatanaBottomRightMarginBox,
+    KatanaBottomRightCornerMarginBox,
+    KatanaLeftTopMarginBox,
+    KatanaLeftMiddleMarginBox,
+    KatanaLeftBottomMarginBox,
+    KatanaRightTopMarginBox,
+    KatanaRightMiddleMarginBox,
+    KatanaRightBottomMarginBox
+} KatanaMarginBoxType;
 
 typedef enum {
     KatanaAttributeMatchTypeCaseSensitive,
@@ -293,9 +320,26 @@ typedef struct {
     KatanaArray* /* KatanaDeclaration */ declarations;
 } KatanaStyleRule;
 
+/**
+ * The `@supports` at-rule.
+ */
+typedef struct {
+    KatanaRule base;
+
+    bool supported;
+    
+    /* supports condition */
+    const char* supports;
+    /**
+     * An `Array` of nodes with the types `rule`, `comment` and any of the
+     at-rule types.
+     */
+    KatanaArray* /* KatanaRule */ rules;
+} KatanaSupportsRule;
+
 typedef struct {
     const char* comment;
-} KatanaComment; // unused for right
+} KatanaComment; // unused right now
 
 /**
  * The `@font-face` at-rule.
@@ -412,7 +456,6 @@ typedef struct {
 	
 	// property value
     KatanaArray* /* KatanaValue */ values;
-    const char* string;
 
 	// is this property marked important
     bool important;

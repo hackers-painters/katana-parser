@@ -197,6 +197,7 @@ union KATANASTYPE
     // CSSSelector::MarginBoxType marginBox;
     KatanaSelectorRelation relation;
     KatanaAttributeMatchType attributeMatchType;
+    KatanaArray* supportList;
     KatanaArray* mediaList;
     KatanaMediaQuery* mediaQuery;
     KatanaMediaQueryRestrictor mediaQueryRestrictor;
