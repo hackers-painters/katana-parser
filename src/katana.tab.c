@@ -2591,6 +2591,7 @@ yyreduce:
 
     {
         // $$ = parser->createSupportsRule($4, $9);
+        (yyval.rule) = katana_new_supports_rule(parser, (yyvsp[-6].boolean), (yyvsp[-1].ruleList));
     }
 
     break;
@@ -2598,7 +2599,7 @@ yyreduce:
   case 99:
 
     {
-        // parser->startRuleHeader(CSSRuleSourceData::SUPPORTS_RULE);
+        katana_start_rule_header(parser, KatanaRuleSupports);
         // parser->markSupportsRuleHeaderStart();
     }
 
@@ -2607,7 +2608,7 @@ yyreduce:
   case 100:
 
     {
-        // parser->endRuleHeader();
+        katana_end_rule_header(parser);
         // parser->markSupportsRuleHeaderEnd();
     }
 
@@ -2617,6 +2618,7 @@ yyreduce:
 
     {
         // $$ = !$3;
+        (yyval.boolean) = !(yyvsp[0].boolean);
     }
 
     break;
@@ -2625,6 +2627,7 @@ yyreduce:
 
     {
         // $$ = $1 && $4;
+        (yyval.boolean) = (yyvsp[-3].boolean) && (yyvsp[0].boolean);
     }
 
     break;
@@ -2633,6 +2636,7 @@ yyreduce:
 
     {
         // $$ = $1 && $4;
+        (yyval.boolean) = (yyvsp[-3].boolean) && (yyvsp[0].boolean);
     }
 
     break;
@@ -2641,6 +2645,7 @@ yyreduce:
 
     {
         // $$ = $1 || $4;
+        (yyval.boolean) = (yyvsp[-3].boolean) || (yyvsp[0].boolean);
     }
 
     break;
@@ -2649,6 +2654,7 @@ yyreduce:
 
     {
         // $$ = $1 || $4;
+        (yyval.boolean) = (yyvsp[-3].boolean) || (yyvsp[0].boolean);
     }
 
     break;
@@ -2657,6 +2663,7 @@ yyreduce:
 
     {
         // $$ = $3;
+        (yyval.boolean) = (yyvsp[-2].boolean);
     }
 
     break;
@@ -2666,6 +2673,7 @@ yyreduce:
     {
         // katana_parser_report_error(parser, $3, InvalidSupportsConditionCSSError);
         // $$ = false;
+        (yyval.boolean) = false;
     }
 
     break;
@@ -2685,6 +2693,7 @@ yyreduce:
         // }
         // parser->m_valueList = nullptr;
         // parser->endProperty($8, false);
+        (yyval.boolean) = katana_support_feature(parser, &(yyvsp[-7].string), (yyvsp[-3].valueList));
     }
 
     break;
@@ -2694,6 +2703,7 @@ yyreduce:
     {
         // $$ = false;
         // parser->endProperty(false, false, GeneralCSSError);
+        (yyval.boolean) = false;
     }
 
     break;
@@ -2941,9 +2951,11 @@ yyreduce:
   case 147:
 
     {
-        (yyval.selectorList) = katana_reusable_selector_list(parser);
+        (yyval.selectorList) = katana_new_selector_list(parser);
         katana_selector_list_shink(parser, 0, (yyval.selectorList));
-        katana_selector_list_add(parser, katana_sink_floating_selector(parser, (yyvsp[0].selector)), (yyval.selectorList));
+        katana_selector_list_add(parser,
+                                 katana_sink_floating_selector(parser, (yyvsp[0].selector)),
+                                 (yyval.selectorList));
     }
 
     break;
@@ -2952,7 +2964,11 @@ yyreduce:
 
     {
         (yyval.selectorList) = (yyvsp[-5].selectorList);
-        katana_selector_list_add(parser, katana_sink_floating_selector(parser, (yyvsp[0].selector)), (yyval.selectorList));
+        if ( yyvsp[0].selector->specificity == 0){
+            katana_selector_list_add(parser,
+                                     katana_sink_floating_selector(parser, (yyvsp[0].selector)),
+                                     (yyval.selectorList));
+        }
     }
 
     break;
@@ -2994,7 +3010,7 @@ yyreduce:
   case 153:
 
     { 
-        katana_string_clear(parser, &(yyval.string));
+        //katana_string_clear(parser, &(yyval.string));
     }
 
     break;
@@ -3101,7 +3117,7 @@ yyreduce:
 
     {
         (yyval.selector) = katana_new_selector(parser);
-        (yyval.selector)->match =KatanaSelectorMatchId;
+        (yyval.selector)->match = KatanaSelectorMatchId;
         // if (isQuirksModeBehavior(parser->m_context.mode()))
             // parser->tokenToLowerCase($1);
         katana_selector_set_value(parser, (yyval.selector), &(yyvsp[0].string));
@@ -3116,7 +3132,7 @@ yyreduce:
             YYERROR;
         } else {
             (yyval.selector) = katana_new_selector(parser);
-            (yyval.selector)->match =KatanaSelectorMatchId;
+            (yyval.selector)->match = KatanaSelectorMatchId;
             // if (isQuirksModeBehavior(parser->m_context.mode()))
                 // parser->tokenToLowerCase($1);
             katana_selector_set_value(parser, (yyval.selector), &(yyvsp[0].string));
@@ -3190,6 +3206,10 @@ yyreduce:
   case 178:
 
     {
+        (yyval.selector) = katana_new_selector(parser);
+        (yyval.selector)->data->attribute = katana_new_qualified_name(parser, NULL, &(yyvsp[-1].string), NULL);
+        (yyval.selector)->data->bits.attributeMatchType = KatanaAttributeMatchTypeCaseSensitive;
+        (yyval.selector)->match = KatanaSelectorMatchAttributeSet;
         // $$ = parser->createFloatingSelector();
         // $$->setAttribute(parser->determineNameInNamespace($3, $4), CSSSelector::CaseSensitive);
         // $$->setMatch(CSSSelector::Set);
@@ -3200,6 +3220,11 @@ yyreduce:
   case 179:
 
     {
+        (yyval.selector) = katana_new_selector(parser);
+        (yyval.selector)->data->attribute = katana_new_qualified_name(parser, NULL, &(yyvsp[-6].string), NULL);
+        (yyval.selector)->data->bits.attributeMatchType = (yyvsp[-1].attributeMatchType);
+        (yyval.selector)->match = (yyvsp[-5].integer);
+        katana_selector_set_value(parser, (yyval.selector), &(yyvsp[-3].string));
         // $$ = parser->createFloatingSelector();
         // $$->setAttribute(parser->determineNameInNamespace($3, $4), $9);
         // $$->setMatch((CSSSelector::Match)$5);

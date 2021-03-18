@@ -69,7 +69,9 @@ void katana_string_prepend_characters(struct KatanaInternalParser* parser, const
 const char* katana_string_to_characters(struct KatanaInternalParser * parser, const KatanaParserString* str);
 // Transforms a KatanaParserString to characters with a char prepended at the start of the KatanaParserString.
 const char* katana_string_to_characters_with_prefix_char(struct KatanaInternalParser * parser, const KatanaParserString* str, const char prefix);
-    
+// Copy string
+char* katana_copy_string(struct KatanaInternalParser* parser, const char* str);
+
 // Appends a string onto the end of the KatanaParserString.
 void katana_string_append_string(struct KatanaInternalParser* parser, KatanaParserString* str, KatanaParserString* output);
 // Returns a bool value that indicates whether a given string matches the beginning characters of the receiver.
